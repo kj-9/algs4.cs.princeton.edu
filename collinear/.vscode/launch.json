@@ -1,0 +1,37 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch BruteCollinearPoints",
+            "request": "launch",
+            "mainClass": "BruteCollinearPoints",
+            "projectName": "collinear_4d2e919c",
+            "args": "input8.txt"
+        },
+        {
+            "type": "java",
+            "name": "Launch FastCollinearPoints",
+            "request": "launch",
+            "mainClass": "FastCollinearPoints",
+            "projectName": "collinear_4d2e919c",
+            "args": "input6.txt"
+        },
+        {
+            "type": "java",
+            "name": "Launch Point",
+            "request": "launch",
+            "mainClass": "Point",
+            "projectName": "collinear_4d2e919c"
+        }
+    ]
+}
