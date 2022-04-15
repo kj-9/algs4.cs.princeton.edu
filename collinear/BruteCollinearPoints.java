@@ -17,31 +17,34 @@ public class BruteCollinearPoints {
         }
 
         int N = points.length;
-        Arrays.sort(points);
 
         for (int i = 0; i < N; i++) {
-            if (points[i] == null) {
+            if (points[i] == null)
                 throw new IllegalArgumentException("Constructor argument: points should not contain null elements.");
-            }
-
-            if (i > 0 && points[i] == points[i-1]) {
-                throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");                
-            }
         }
+
+        Point[] procPoints = Arrays.copyOf(points, N);
+        Arrays.sort(procPoints);
+
+        for (int i = 0; i < N; i++) {
+            if (i > 0 && procPoints[i].compareTo(procPoints[i-1]) == 0)
+                throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
+        }
+
 
         for (int i = 0; i < N - 3; i++) {
             for (int j = i + 1; j < N - 2; j++) {
-                double slopeJ = points[i].slopeTo(points[j]);
+                double slopeJ = procPoints[i].slopeTo(procPoints[j]);
 
                 for (int k = j + 1; k < N - 1; k++) {
-                    double slopeK = points[i].slopeTo(points[k]);
+                    double slopeK = procPoints[i].slopeTo(procPoints[k]);
 
                     if (slopeJ != slopeK) 
                         continue;
 
                     for (int l = k + 1; l < N; l++) {
-                        if (slopeJ == points[i].slopeTo(points[l])) {
-                            LineSegment ls = new LineSegment(points[i], points[l]);
+                        if (slopeJ == procPoints[i].slopeTo(procPoints[l])) {
+                            LineSegment ls = new LineSegment(procPoints[i], procPoints[l]);
                             lineSegments.add(ls);
                         }
                     }
@@ -68,7 +71,6 @@ public class BruteCollinearPoints {
     }
 
     public static void main(String[] args) {
-
         // read the n points from a file
         In in = new In(args[0]);
         int n = in.readInt();

@@ -13,7 +13,7 @@ The algorithm solves the problem because points that have equal slopes with resp
 and sorting brings such points together. The algorithm is fast because the bottleneck operation is sorting.
  */
 public class FastCollinearPoints {
-    private final ArrayList<Point[]> lsPoints = new ArrayList<Point[]>();
+    private LineSegment[] lineSegment;
 
     public FastCollinearPoints(Point[] points) {
         // finds all line segments containing 4 or more points
@@ -24,16 +24,21 @@ public class FastCollinearPoints {
         int N = points.length;
 
         for (int i = 0; i < N; i++) {
-            if (points[i] == null) {
+            if (points[i] == null)
                 throw new IllegalArgumentException("Constructor argument: points should not contain null elements.");
-            }
-
-            if (i > 0 && points[i] == points[i - 1]) {
-                throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
-            }
         }
 
         Point[] procPoints = Arrays.copyOf(points, N);
+        Arrays.sort(procPoints);
+
+        for (int i = 0; i < N; i++) {
+            if (i > 0 && procPoints[i].compareTo(procPoints[i-1]) == 0)
+                throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
+        }
+
+        ArrayList<Point[]> lsPoints = new ArrayList<Point[]>();
+
+        
 
         for (int i = 0; i < N; i++) {
 
@@ -51,7 +56,6 @@ public class FastCollinearPoints {
                 slopeCrt = procPoints[0].slopeTo(procPoints[j]);
 
                 if (slopeBfr != null && !slopeBfr.equals(slopeCrt)) {
-
 
                     if (coPoints.size() >= 3) {
                         coPoints.add(procPoints[0]); // add self
@@ -87,23 +91,23 @@ public class FastCollinearPoints {
                 coPoints.add(procPoints[j]);
             }
         }
+
+        lineSegment = new LineSegment[lsPoints.size()];
+        for (int i = 0; i < lineSegment.length; i++) {
+            Point[] lsp = lsPoints.get(i);
+            lineSegment[i] = new LineSegment(lsp[0], lsp[1]);
+        }
     }
 
     public int numberOfSegments() {
         // the number of line segments
-        return lsPoints.size();
+        return lineSegment.length;
 
     }
 
     public LineSegment[] segments() {
         // the line segments
-        LineSegment[] arr = new LineSegment[lsPoints.size()];
-
-        for (int i = 0; i < arr.length; i++) {
-            Point[] lsp = lsPoints.get(i);
-            arr[i] = new LineSegment(lsp[0], lsp[1]);
-        }
-        return arr;
+        return lineSegment;
 
     }
     public static void main(String[] args) {
