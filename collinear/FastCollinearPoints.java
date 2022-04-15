@@ -36,31 +36,30 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
         }
 
-        ArrayList<Point[]> lsPoints = new ArrayList<Point[]>();
-
+        ArrayList<LineSegment> ls = new ArrayList<LineSegment>();
+        ArrayList<Double> slopes = new ArrayList<Double>();
         
 
         for (int i = 0; i < N; i++) {
 
             ArrayList<Point> coPoints = new ArrayList<Point>();
+
             Double slopeBfr = null;
             Double slopeCrt = null;
-            boolean isExists = false;
         
             Arrays.sort(procPoints, points[i].slopeOrder());
 
-            for (int j = 1; j < N; j++) { // j=1 since j=0 is point[i]
-                
-                
+            for (int j = 1; j <= N; j++) { // j=1 since j=0 is point[i]                
                 slopeBfr = slopeCrt;
-                slopeCrt = procPoints[0].slopeTo(procPoints[j]);
 
-                if (slopeBfr != null && !slopeBfr.equals(slopeCrt)) {
+                if (j != N)
+                    slopeCrt = procPoints[0].slopeTo(procPoints[j]);
+
+                if (slopeBfr != null && !slopeBfr.equals(slopeCrt) ||  (j == N)) {
 
                     if (coPoints.size() >= 3) {
                         coPoints.add(procPoints[0]); // add self
 
-                       
                         Point[] coPointsArr = new Point[coPoints.size()];
 
                         for (int k = 0; k < coPoints.size(); k++) {
@@ -69,33 +68,21 @@ public class FastCollinearPoints {
 
                         Arrays.sort(coPointsArr);
 
-                        Point[] ps = new Point[2];
-                        ps[0] = coPointsArr[0];
-                        ps[1] = coPointsArr[coPointsArr.length - 1];
+                        ls.add(new LineSegment(coPointsArr[0], coPointsArr[coPointsArr.length - 1]));
+                        slopes.add(slopeBfr);
 
-                        isExists = false;
-
-                        for (Point[] lsp : lsPoints) {
-                            if (lsp[0] == ps[0] && lsp[1] == ps[1]) {
-                                isExists=true;
-                                break;
-                            }
-                        }
-                        
-                        if (!isExists) {
-                            lsPoints.add(ps);
-                        }
                     }
                     coPoints.clear();
                 }
-                coPoints.add(procPoints[j]);
+
+                if (!slopes.contains(slopeCrt) && (j != N))
+                    coPoints.add(procPoints[j]);
             }
         }
 
-        lineSegment = new LineSegment[lsPoints.size()];
-        for (int i = 0; i < lineSegment.length; i++) {
-            Point[] lsp = lsPoints.get(i);
-            lineSegment[i] = new LineSegment(lsp[0], lsp[1]);
+        lineSegment = new LineSegment[ls.size()];
+        for (int i = 0; i < ls.size(); i++) {
+            lineSegment[i] = ls.get(i);
         }
     }
 
