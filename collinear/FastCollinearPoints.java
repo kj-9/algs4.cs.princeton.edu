@@ -37,6 +37,11 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
         }
 
+        if (N < 4) {
+            lineSegment = new LineSegment[0];
+            return;
+        }
+
         ArrayList<LineSegment> ls = new ArrayList<LineSegment>();
 
         for (int i = 0; i < N; i++) {
@@ -46,6 +51,7 @@ public class FastCollinearPoints {
             Double slopeBfr = null;
             Double slopeCrt = null;
 
+            Arrays.sort(procPoints);
             Arrays.sort(procPoints, points[i].slopeOrder());
 
             for (int j = 1; j <= N; j++) { // j=1 since j=0 is point[i]
@@ -54,27 +60,21 @@ public class FastCollinearPoints {
                 if (j != N)
                     slopeCrt = procPoints[0].slopeTo(procPoints[j]);
 
-                if (slopeBfr != null && !slopeBfr.equals(slopeCrt) || (j == N)) {
-
-                    if (coPoints.size() >= 3) {
-                        coPoints.add(procPoints[0]); // add self
-
-                        Point[] coPointsArr = new Point[coPoints.size()];
-
-                        for (int k = 0; k < coPoints.size(); k++) {
-                            coPointsArr[k] = coPoints.get(k);
-                        }
-
-                        Arrays.sort(coPointsArr);
-
-                        if (coPointsArr[0] == procPoints[0]) {
-                            ls.add(new LineSegment(coPointsArr[0], coPointsArr[coPointsArr.length - 1]));
-                        }                        
+                if (slopeBfr != null && (!slopeBfr.equals(slopeCrt) || j == N)) {
+                    if (coPoints.size() >= 4) {
+                        ls.add(new LineSegment(coPoints.get(0), coPoints.get(coPoints.size() - 1)));
                     }
+                    if (j == N)
+                        break;
                     coPoints.clear();
                 }
 
-                if (j != N) // need to check constant also...
+                // set start
+                if (coPoints.size() == 0 && (slopeBfr == null || !slopeBfr.equals(slopeCrt))
+                        && procPoints[0].compareTo(procPoints[j]) < 0)
+                    coPoints.add(procPoints[0]);
+
+                if (coPoints.size() > 0)
                     coPoints.add(procPoints[j]);
             }
         }
