@@ -2,6 +2,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
+
 /* 
 - Think of p as the origin.
 - For each other point q, determine the slope it makes with p.
@@ -32,13 +33,11 @@ public class FastCollinearPoints {
         Arrays.sort(procPoints);
 
         for (int i = 0; i < N; i++) {
-            if (i > 0 && procPoints[i].compareTo(procPoints[i-1]) == 0)
+            if (i > 0 && procPoints[i].compareTo(procPoints[i - 1]) == 0)
                 throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
         }
 
-        ArrayList<LineSegment> ls = new ArrayList<LineSegment>();
-        ArrayList<Double> slopes = new ArrayList<Double>();
-        
+        ArrayList<Point[]> lsPoints = new ArrayList<Point[]>();
 
         for (int i = 0; i < N; i++) {
 
@@ -46,16 +45,16 @@ public class FastCollinearPoints {
 
             Double slopeBfr = null;
             Double slopeCrt = null;
-        
+
             Arrays.sort(procPoints, points[i].slopeOrder());
 
-            for (int j = 1; j <= N; j++) { // j=1 since j=0 is point[i]                
+            for (int j = 1; j <= N; j++) { // j=1 since j=0 is point[i]
                 slopeBfr = slopeCrt;
 
                 if (j != N)
                     slopeCrt = procPoints[0].slopeTo(procPoints[j]);
 
-                if (slopeBfr != null && !slopeBfr.equals(slopeCrt) ||  (j == N)) {
+                if (slopeBfr != null && !slopeBfr.equals(slopeCrt) || (j == N)) {
 
                     if (coPoints.size() >= 3) {
                         coPoints.add(procPoints[0]); // add self
@@ -63,26 +62,38 @@ public class FastCollinearPoints {
                         Point[] coPointsArr = new Point[coPoints.size()];
 
                         for (int k = 0; k < coPoints.size(); k++) {
-                            coPointsArr[k] = coPoints.get(k);                            
+                            coPointsArr[k] = coPoints.get(k);
                         }
 
                         Arrays.sort(coPointsArr);
 
-                        ls.add(new LineSegment(coPointsArr[0], coPointsArr[coPointsArr.length - 1]));
-                        slopes.add(slopeBfr);
+                        Point[] lsPoint = new Point[2];
+                        lsPoint[0] = coPointsArr[0];
+                        lsPoint[1] = coPointsArr[coPointsArr.length - 1];
 
+                        if (lsPoints.size() == 0)
+                            lsPoints.add(lsPoint);
+                        else {
+                            for (int m = 0; m < lsPoints.size(); m++) {
+                                if (lsPoints.get(m)[0] == lsPoint[0] && lsPoints.get(m)[1] == lsPoint[1]) {
+                                    break;
+                                }
+
+                                if (m == (lsPoints.size() - 1))
+                                    lsPoints.add(lsPoint);
+                            }
+                        }
                     }
                     coPoints.clear();
                 }
 
-                if (!slopes.contains(slopeCrt) && (j != N))
+                if (j != N) // need to check constant also...
                     coPoints.add(procPoints[j]);
             }
         }
-
-        lineSegment = new LineSegment[ls.size()];
-        for (int i = 0; i < ls.size(); i++) {
-            lineSegment[i] = ls.get(i);
+        lineSegment = new LineSegment[lsPoints.size()];
+        for (int i = 0; i < lsPoints.size(); i++) {
+            lineSegment[i] = new LineSegment(lsPoints.get(i)[0], lsPoints.get(i)[1]);
         }
     }
 
@@ -94,9 +105,10 @@ public class FastCollinearPoints {
 
     public LineSegment[] segments() {
         // the line segments
-        return lineSegment;
+        return lineSegment.clone();
 
     }
+
     public static void main(String[] args) {
 
         // read the n points from a file
@@ -108,26 +120,27 @@ public class FastCollinearPoints {
             int y = in.readInt();
             points[i] = new Point(x, y);
         }
-      
-    
+
         // draw the points
-/*         StdDraw.enableDoubleBuffering();
-        StdDraw.setXscale(0, 32768);
-        StdDraw.setYscale(0, 32768);
-        for (Point p : points) {
-            p.draw();
-        }
-        StdDraw.show();
- */    
+        /*
+         * StdDraw.enableDoubleBuffering();
+         * StdDraw.setXscale(0, 32768);
+         * StdDraw.setYscale(0, 32768);
+         * for (Point p : points) {
+         * p.draw();
+         * }
+         * StdDraw.show();
+         */
         // print and draw the line segments
         FastCollinearPoints collinear = new FastCollinearPoints(points);
         System.out.println(collinear.numberOfSegments());
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
-     
-            //segment.draw();
+
+            // segment.draw();
         }
-   /*      StdDraw.show();
-    */
- }
+        /*
+         * StdDraw.show();
+         */
+    }
 }
