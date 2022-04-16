@@ -37,7 +37,7 @@ public class FastCollinearPoints {
                 throw new IllegalArgumentException("Constructor argument: points should not contain a repeated point.");
         }
 
-        ArrayList<Point[]> lsPoints = new ArrayList<Point[]>();
+        ArrayList<LineSegment> ls = new ArrayList<LineSegment>();
 
         for (int i = 0; i < N; i++) {
 
@@ -67,22 +67,9 @@ public class FastCollinearPoints {
 
                         Arrays.sort(coPointsArr);
 
-                        Point[] lsPoint = new Point[2];
-                        lsPoint[0] = coPointsArr[0];
-                        lsPoint[1] = coPointsArr[coPointsArr.length - 1];
-
-                        if (lsPoints.size() == 0)
-                            lsPoints.add(lsPoint);
-                        else {
-                            for (int m = 0; m < lsPoints.size(); m++) {
-                                if (lsPoints.get(m)[0] == lsPoint[0] && lsPoints.get(m)[1] == lsPoint[1]) {
-                                    break;
-                                }
-
-                                if (m == (lsPoints.size() - 1))
-                                    lsPoints.add(lsPoint);
-                            }
-                        }
+                        if (coPointsArr[0] == procPoints[0]) {
+                            ls.add(new LineSegment(coPointsArr[0], coPointsArr[coPointsArr.length - 1]));
+                        }                        
                     }
                     coPoints.clear();
                 }
@@ -91,9 +78,9 @@ public class FastCollinearPoints {
                     coPoints.add(procPoints[j]);
             }
         }
-        lineSegment = new LineSegment[lsPoints.size()];
-        for (int i = 0; i < lsPoints.size(); i++) {
-            lineSegment[i] = new LineSegment(lsPoints.get(i)[0], lsPoints.get(i)[1]);
+        lineSegment = new LineSegment[ls.size()];
+        for (int i = 0; i < ls.size(); i++) {
+            lineSegment[i] = ls.get(i);
         }
     }
 
