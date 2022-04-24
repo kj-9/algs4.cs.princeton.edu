@@ -61,14 +61,19 @@ public class Solver {
 
     private boolean doesExistsParentBoard(Node n, Board b) {
 
-        while (true) {
+        int count = 0;
+
+        while (count < 2) {
             if (n.parent == null)
                 return false;
             n = n.parent;
 
             if (n.board.equals(b))
                 return true;
+
+            count++;
         }
+        return false;
     }
 
     private class Node {
