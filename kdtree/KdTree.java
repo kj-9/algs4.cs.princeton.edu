@@ -1,10 +1,5 @@
-import org.w3c.dom.css.Rect;
-
-import edu.princeton.cs.algs4.BST;
-import edu.princeton.cs.algs4.Draw;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
 
@@ -198,53 +193,49 @@ public class KdTree {
     private Point2D nearest(Node n, Point2D p, Point2D closest, double distsq, double x0, double y0, double x1,
             double y1) {
 
-        if (n == null)
-            return closest;
-
         double distsqCur = n.p.distanceSquaredTo(p);
 
         if (distsqCur < distsq) {
-            closest = p;
+            closest = n.p;
             distsq = distsqCur;
         }
+        if (n.left == null && n.right == null)
+            return closest;
 
         if (n.cordinate) {
-            if (n.left != null) {
-                distsqCur = new RectHV(x0, y0, n.p.x(), y1).distanceSquaredTo(p);
+            if (n.left != null && n.right != null) {
+                double distsqL = new RectHV(x0, y0, n.p.x(), y1).distanceSquaredTo(p);
+                double distsqR = new RectHV(n.p.x(), y0, x1, y1).distanceSquaredTo(p);
 
-                if (distsqCur < distsq)
+                if (distsqL < distsqR)
                     return nearest(n.left, p, closest, distsq, x0, y0, x1, y1);
+                else
+                    return nearest(n.right, p, closest, distsq, n.p.x(), y0, x1, y1);
 
-            }
-
-            if (n.right != null) {
-                distsqCur = new RectHV(n.p.x(), y0, x1, y1).distanceSquaredTo(p);
-
-                if (distsqCur < distsq)
-                    return nearest(n.left, p, closest, distsq, n.p.x(), y0, x1, y1);
-
-            }
+            } else if (n.left != null)
+                return nearest(n.left, p, closest, distsq, x0, y0, x1, y1);
+            else if (n.right != null)
+                return nearest(n.right, p, closest, distsq, n.p.x(), y0, x1, y1);
+            else
+                return closest;
 
         } else {
-            if (n.left != null) {
-                distsqCur = new RectHV(x0, y0, x1, n.p.y()).distanceSquaredTo(p);
+            if (n.left != null && n.right != null) {
+                double distsqL = new RectHV(x0, y0, x1, n.p.y()).distanceSquaredTo(p);
+                double distsqR = new RectHV(x0, n.p.y(), x1, y1).distanceSquaredTo(p);
 
-                if (distsqCur < distsq)
+                if (distsqL < distsqR)
                     return nearest(n.left, p, closest, distsq, x0, y0, x1, n.p.y());
+                else
+                    return nearest(n.right, p, closest, distsq, x0, n.p.y(), x1, y1);
+            } else if (n.left != null)
+                return nearest(n.left, p, closest, distsq, x0, y0, x1, n.p.y());
+            else if (n.right != null)
+                return nearest(n.right, p, closest, distsq, x0, n.p.y(), x1, y1);
+            else
+                return closest;
 
-            }
-
-            if (n.right != null) {
-
-                distsqCur = new RectHV(x0, n.p.y(), x1, y1).distanceSquaredTo(p);
-
-                if (distsqCur < distsq)
-                    return nearest(n.left, p, closest, distsq, x0, n.p.y(), x1, y1);
-            }
         }
-
-        return closest;
-
     }
 
     // unit testing of the methods (optional)
