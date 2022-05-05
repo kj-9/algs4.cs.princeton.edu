@@ -186,7 +186,7 @@ public class KdTree {
         if (query == null)
             throw new IllegalArgumentException("argument cant be null");
 
-        Point2D out = nearest(query, root, root.p, Double.POSITIVE_INFINITY, 0, 0, 1, 1);
+        Point2D out = nearest(query, root, null, Double.POSITIVE_INFINITY, 0, 0, 1, 1);
 
         return out;
 
