@@ -8,9 +8,9 @@ public class KdTree {
     private Node root;
 
     private class Node {
-        private Point2D p;
+        private final Point2D p;
         private Node left, right;
-        private boolean cordinate; // true if using xCord
+        private final boolean cordinate; // true if using xCord
         private int size;
 
         public Node(Point2D p, boolean cordinate, int size) {
@@ -114,8 +114,8 @@ public class KdTree {
         if (n == null)
             return;
 
+        StdDraw.setPenRadius(0.001);
         if (n.cordinate) {
-            StdDraw.setPenRadius(0.001);
             StdDraw.setPenColor(StdDraw.RED);
 
             StdDraw.line(n.p.x(), y0, n.p.x(), y1);
@@ -127,7 +127,6 @@ public class KdTree {
                 draw(n.right, n.p.x(), y0, x1, y1);
 
         } else {
-            StdDraw.setPenRadius(0.001);
             StdDraw.setPenColor(StdDraw.BLUE);
             StdDraw.line(x0, n.p.y(), x1, n.p.y());
 
@@ -187,48 +186,57 @@ public class KdTree {
         if (query == null)
             throw new IllegalArgumentException("argument cant be null");
 
-        Point2D out = nearest(query, root, root.p, root.p.distanceSquaredTo(query));
+        Point2D out = nearest(query, root, root.p, Double.POSITIVE_INFINITY, 0, 0, 1, 1);
 
         return out;
 
     }
 
-    private Point2D nearest(Point2D query, Node n, Point2D closest, double distsq) {
+    private Point2D nearest(Point2D query, Node n, Point2D closest, double distsq,
+            double x0, double y0, double x1, double y1) {
 
-        if (n == null || n.left == null && n.right == null)
+        if (n == null)
+            return closest;
+
+        double distsqCur = n.p.distanceSquaredTo(query);
+
+        if (distsqCur <= distsq) {
+            distsq = distsqCur;
+            closest = n.p;
+        }
+
+        if (n.left == null && n.right == null)
             return closest;
 
         Point2D closestL = null;
         Point2D closestR = null;
 
         if (n.left != null) {
-            double distsqCur = n.left.p.distanceSquaredTo(query);
-
-            if (distsqCur <= distsq)
-                return nearest(query, n.left, n.left.p, distsqCur);
-            else
-                closestL = nearest(query, n.left, closest, distsq);
+            if (n.cordinate) {
+                if (new RectHV(x0, y0, n.p.x(), y1).distanceSquaredTo(query) <= distsq)
+                    closestL = nearest(query, n.left, closest, distsq, x0, y0, n.p.x(), y1);
+            } else if (new RectHV(x0, y0, x1, n.p.y()).distanceSquaredTo(query) <= distsq)
+                closestL = nearest(query, n.left, closest, distsq, x0, y0, x1, n.p.y());
         }
 
         if (n.right != null) {
-            double distsqCur = n.right.p.distanceSquaredTo(query);
-
-            if (distsqCur <= distsq)
-                return nearest(query, n.right, n.right.p, distsqCur);
-            else
-                closestR = nearest(query, n.right, closest, distsq);
-
+            if (n.cordinate) {
+                if (new RectHV(n.p.x(), y0, x1, y1).distanceSquaredTo(query) <= distsq)
+                    closestR = nearest(query, n.right, closest, distsq, n.p.x(), y0, x1, y1);
+            } else if (new RectHV(x0, n.p.y(), x1, y1).distanceSquaredTo(query) <= distsq)
+                closestR = nearest(query, n.right, closest, distsq, x0, n.p.y(), x1, y1);
         }
 
         if (closestL != null && closestR == null)
             return closestL;
         else if (closestL == null && closestR != null)
             return closestR;
+        else if (closestL == null && closestR == null)
+            return closest;
         else if (closestL.distanceSquaredTo(query) < closestR.distanceSquaredTo(query))
             return closestL;
         else
             return closestR;
-
     }
 
     // unit testing of the methods (optional)
