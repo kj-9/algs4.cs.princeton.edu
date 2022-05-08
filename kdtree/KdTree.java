@@ -57,12 +57,12 @@ public class KdTree {
             return n;
 
         if (cordinate) {
-            if (p.x() < n.p.x())
+            if (p.x() <= n.p.x())
                 n.left = insert(n.left, p, !cordinate);
             else
                 n.right = insert(n.right, p, !cordinate);
         } else {
-            if (p.y() < n.p.y())
+            if (p.y() <= n.p.y())
                 n.left = insert(n.left, p, !cordinate);
             else
                 n.right = insert(n.right, p, !cordinate);
@@ -89,12 +89,12 @@ public class KdTree {
             return p;
 
         if (n.cordinate) {
-            if (p.x() < n.p.x())
+            if (p.x() <= n.p.x())
                 return get(n.left, p);
             else
                 return get(n.right, p);
         } else {
-            if (p.y() < n.p.y())
+            if (p.y() <= n.p.y())
                 return get(n.left, p);
             else
                 return get(n.right, p);
@@ -229,7 +229,7 @@ public class KdTree {
 
         boolean firstL = false;
 
-        if (distsqL != null && distsqR != null && distsqL == 0) {
+        if (distsqL != null && distsqR != null && distsqL <= distsqR) {
             firstL = true;
         }
 
