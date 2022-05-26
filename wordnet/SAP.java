@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class SAP {
-    private Digraph G;
+    private final Digraph G;
     private int root;
 
     // constructor takes a digraph (not necessarily a DAG)
@@ -39,45 +39,34 @@ public class SAP {
 
     }
 
+    private int ancestor(BreadthFirstDirectedPaths bfpV, BreadthFirstDirectedPaths bfpW) {
+
+        Integer minDist = Integer.MAX_VALUE;
+        Integer curDist = null;
+        Integer anc = null;
+
+        for (int i = 0; i < G.V(); i++) {
+            if (bfpV.hasPathTo(i) && bfpW.hasPathTo(i)) {
+                curDist = bfpV.distTo(i) + bfpW.distTo(i);
+
+                if (curDist < minDist) {
+                    minDist = curDist;
+                    anc = i;
+                }
+            }
+        }
+
+        if (anc == null)
+            return -1;
+        else
+            return anc;
+    }
+
     // a common ancestor of v and w that participates in a shortest ancestral path;
     // -1 if no such path
     public int ancestor(int v, int w) {
 
-        BreadthFirstDirectedPaths bfpV = new BreadthFirstDirectedPaths(G, v);
-        Iterable<Integer> pathV = bfpV.pathTo(root);
-
-        if (pathV == null)
-            return -1;
-        Iterator<Integer> pathViter = pathV.iterator();
-
-        BreadthFirstDirectedPaths bfpW = new BreadthFirstDirectedPaths(G, w);
-        Iterable<Integer> pathW = bfpW.pathTo(root);
-
-        if (pathW == null)
-            return -1;
-        Iterator<Integer> pathWiter = pathW.iterator();
-
-        int v2w = bfpV.distTo(root) - bfpW.distTo(root);
-
-        while (v2w > 0) {
-            pathViter.next();
-            v2w--;
-        }
-
-        while (v2w < 0) {
-            pathWiter.next();
-            v2w++;
-        }
-
-        while (pathViter.hasNext()) {
-            int ancV = pathViter.next();
-            int ancW = pathWiter.next();
-
-            if (ancV == ancW)
-                return ancV;
-        }
-
-        return -1;
+        return ancestor(new BreadthFirstDirectedPaths(G, v), new BreadthFirstDirectedPaths(G, w));
 
     }
 
@@ -85,15 +74,8 @@ public class SAP {
     // w; -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
 
-        int anc = ancestor(v, w);
+        return ancestor(new BreadthFirstDirectedPaths(G, v), new BreadthFirstDirectedPaths(G, w));
 
-        if (anc == -1)
-            return -1;
-
-        BreadthFirstDirectedPaths bfpV = new BreadthFirstDirectedPaths(G, v);
-        BreadthFirstDirectedPaths bfpW = new BreadthFirstDirectedPaths(G, w);
-
-        return bfpV.distTo(anc) + bfpW.distTo(anc);
     }
 
     // a common ancestor that participates in shortest ancestral path; -1 if no such
@@ -129,7 +111,7 @@ public class SAP {
         In in = new In(args[0]);
         Digraph G = new Digraph(in);
         SAP sap = new SAP(G);
-        int[][] inputs = new int[][] { { 3, 11 }, { 9, 12 }, { 7, 2 }, { 1, 6 } };
+        int[][] inputs = { { 3, 11 }, { 9, 12 }, { 7, 2 }, { 1, 6 }, { 6, 6 } };
 
         for (int[] input : inputs) {
             int length = sap.length(input[0], input[1]);

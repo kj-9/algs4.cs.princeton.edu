@@ -5,13 +5,14 @@ import java.util.stream.Stream;
 import java.util.ArrayList;
 
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.SeparateChainingHashST;
 
 public class WordNet {
-    private ArrayList<String> synsets;
-    private SeparateChainingHashST<String, Stack<Integer>> words;
-    private Digraph G;
+    private final ArrayList<String> synsets;
+    private final SeparateChainingHashST<String, Stack<Integer>> words;
+    private final Digraph G;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -54,6 +55,20 @@ public class WordNet {
                 G.addEdge(edge[0], edge[i]);
             }
         }
+
+        if (new DirectedCycle(G).hasCycle())
+            throw new IllegalArgumentException("input graph is not a DAG.");
+
+        int roots = 0;
+        for (int i = 0; i < this.G.V(); i++) {
+            if (this.G.outdegree(i) == 0)
+                roots++;
+
+            if (roots > 1)
+                throw new IllegalArgumentException("input graph has more than one root.");
+
+        }
+
     }
 
     // returns all WordNet nouns
