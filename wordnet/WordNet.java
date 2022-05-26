@@ -13,6 +13,7 @@ public class WordNet {
     private final ArrayList<String> synsets;
     private final SeparateChainingHashST<String, Stack<Integer>> words;
     private final Digraph G;
+    private final SAP sap;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -69,6 +70,8 @@ public class WordNet {
 
         }
 
+        sap = new SAP(G);
+
     }
 
     // returns all WordNet nouns
@@ -86,7 +89,6 @@ public class WordNet {
         if (!isNoun(nounA) || !isNoun(nounB))
             throw new IllegalArgumentException("noun must be in wordnet.");
 
-        SAP sap = new SAP(G);
         Integer len = sap.length(words.get(nounA), words.get(nounB));
         return len;
     }
@@ -98,7 +100,6 @@ public class WordNet {
         if (!isNoun(nounA) || !isNoun(nounB))
             throw new IllegalArgumentException("noun must be in wordnet.");
 
-        SAP sap = new SAP(G);
         Integer anc = sap.ancestor(words.get(nounA), words.get(nounB));
 
         return synsets.get(anc);
