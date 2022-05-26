@@ -3,23 +3,13 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class SAP {
     private final Digraph G;
-    private int root;
 
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
         this.G = new Digraph(G);
-
-        for (int i = 0; i < this.G.V(); i++) {
-            if (this.G.outdegree(i) == 0) {
-                root = i;
-                break;
-            }
-
-        }
     }
 
     // length of shortest ancestral path between v and w; -1 if no such path
@@ -34,9 +24,7 @@ public class SAP {
             int wDist = new BreadthFirstDirectedPaths(G, w).distTo(acr);
 
             return vDist + wDist;
-
         }
-
     }
 
     private int ancestor(BreadthFirstDirectedPaths bfpV, BreadthFirstDirectedPaths bfpW) {
@@ -65,6 +53,8 @@ public class SAP {
     // a common ancestor of v and w that participates in a shortest ancestral path;
     // -1 if no such path
     public int ancestor(int v, int w) {
+        if (v < 0 || v >= G.V() || w < 0 || w >= G.V())
+            throw new IllegalArgumentException("argument is out of range.");
 
         return ancestor(new BreadthFirstDirectedPaths(G, v), new BreadthFirstDirectedPaths(G, w));
 
@@ -74,36 +64,41 @@ public class SAP {
     // w; -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
 
-        return ancestor(new BreadthFirstDirectedPaths(G, v), new BreadthFirstDirectedPaths(G, w));
+        int acr = ancestor(v, w);
 
+        if (acr == -1)
+            return -1;
+        else {
+            int vDist = new BreadthFirstDirectedPaths(G, v).distTo(acr);
+            int wDist = new BreadthFirstDirectedPaths(G, w).distTo(acr);
+
+            return vDist + wDist;
+        }
     }
 
     // a common ancestor that participates in shortest ancestral path; -1 if no such
     // path
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
 
-        BreadthFirstDirectedPaths bfpV = new BreadthFirstDirectedPaths(G, v);
-        BreadthFirstDirectedPaths bfpW = new BreadthFirstDirectedPaths(G, w);
+        if (v == null || w == null)
+            throw new IllegalArgumentException("arguments must not be null.");
 
-        Integer minDist = Integer.MAX_VALUE;
-        Integer curDist = null;
-        Integer anc = null;
-
-        for (int i = 0; i < G.V(); i++) {
-            if (bfpV.hasPathTo(i) && bfpW.hasPathTo(i)) {
-                curDist = bfpV.distTo(i) + bfpW.distTo(i);
-
-                if (curDist < minDist) {
-                    minDist = curDist;
-                    anc = i;
-                }
-            }
+        for (Integer vi : v) {
+            if (vi == null || vi < 0 || G.V() <= vi)
+                throw new IllegalArgumentException("v must not contain null.");
         }
 
-        if (anc == null)
+        for (Integer wi : w) {
+            if (wi == null || wi < 0 || G.V() <= wi)
+                throw new IllegalArgumentException("w must not contain null.");
+        }
+
+        try {
+            return ancestor(new BreadthFirstDirectedPaths(G, v), new BreadthFirstDirectedPaths(G, w));
+
+        } catch (IllegalArgumentException e) {
             return -1;
-        else
-            return anc;
+        }
     }
 
     // do unit testing of this class
