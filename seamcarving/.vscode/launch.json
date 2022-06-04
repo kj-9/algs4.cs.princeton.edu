@@ -1,0 +1,53 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch ResizeDemo",
+            "request": "launch",
+            "mainClass": "ResizeDemo",
+            "projectName": "seamcarving_8e6ba02b",
+            "args": "HJoceanSmall.png 100 20"
+        },
+        {
+            "type": "java",
+            "name": "Launch PrintSeams",
+            "request": "launch",
+            "mainClass": "PrintSeams",
+            "projectName": "seamcarving_8e6ba02b",
+            "args": "6x5.png"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch PrintEnergy",
+            "request": "launch",
+            "mainClass": "PrintEnergy",
+            "projectName": "seamcarving_8e6ba02b",
+            "args": "6x5.png"
+        },
+        {
+            "type": "java",
+            "name": "Launch SeamCarver",
+            "request": "launch",
+            "mainClass": "SeamCarver",
+            "projectName": "seamcarving_8e6ba02b"
+        },
+        {
+            "type": "java",
+            "name": "Launch ShowEnergy",
+            "request": "launch",
+            "mainClass": "ShowEnergy",
+            "projectName": "seamcarving_8e6ba02b",
+            "args": "HJoceanSmall.png"
+        }
+    ]
+}
