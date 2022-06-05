@@ -265,7 +265,7 @@ public class SeamCarver {
                     else if (x == seam[y] - 1 || x == seam[y])
                         newEnergies[x][y] = energy(x, y);
                     else
-                        newEnergies[x][y] = energies[x - 1][y];
+                        newEnergies[x][y] = energies[x + 1][y];
                 }
             }
         }
