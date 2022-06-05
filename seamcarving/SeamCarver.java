@@ -186,43 +186,46 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-        if (seam == null)
-            throw new IllegalArgumentException("argument is null");
 
-        if (seam.length != width())
-            throw new IllegalArgumentException("argument length does not match");
+        Picture tp = new Picture(height(), width());
+        Double[][] te = new Double[height()][width()];
 
-        for (int i = 1; i < seam.length; i++) {
-            int diff = seam[i - 1] - seam[i];
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                tp.setRGB(y, x, picture.getRGB(x, y));
 
-            if (diff < -1 || diff > 1)
-                throw new IllegalArgumentException("successive entries in seam[] must differ by -1, 0, or +1.");
-        }
-
-        if (height() <= 1)
-            throw new IllegalArgumentException("too small to decrease picture size");
-
-        Picture newPicture = new Picture(width(), height() - 1);
-
-        for (int x = 0; x < this.picture.width(); x++) {
-            for (int y = 0; y < this.picture.height(); y++) {
-
-                if (y < seam[x])
-                    newPicture.setRGB(x, y, this.picture.getRGB(x, y));
-                else if (y == seam[x])
+                if (energies == null)
                     continue;
-                else
-                    newPicture.setRGB(x, y - 1, this.picture.getRGB(x, y));
-
+                te[y][x] = energies[x][y];
             }
         }
 
-        this.picture = newPicture;
+        this.picture = tp;
+        this.energies = te;
+
+        removeVerticalSeam(seam);
+
+        Picture p = new Picture(height(), width());
+        Double[][] e = new Double[height()][width()];
+
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                p.setRGB(y, x, picture.getRGB(x, y));
+
+                if (energies == null)
+                    continue;
+                e[y][x] = energies[x][y];
+            }
+        }
+
+        this.picture = p;
+        this.energies = e;
 
     }
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
+
         if (seam == null)
             throw new IllegalArgumentException("argument is null");
         if (seam.length != height())
@@ -240,20 +243,34 @@ public class SeamCarver {
 
         Picture newPicture = new Picture(width() - 1, height());
 
-        for (int y = 0; y < this.picture.height(); y++) {
-            for (int x = 0; x < this.picture.width(); x++) {
+        for (int y = 0; y < picture.height(); y++) {
+            for (int x = 0; x < picture.width(); x++) {
 
                 if (x < seam[y])
-                    newPicture.setRGB(x, y, this.picture.getRGB(x, y));
-                else if (x == seam[y])
-                    continue;
-                else
-                    newPicture.setRGB(x - 1, y, this.picture.getRGB(x, y));
-
+                    newPicture.setRGB(x, y, picture.getRGB(x, y));
+                if (x > seam[y])
+                    newPicture.setRGB(x - 1, y, picture.getRGB(x, y));
             }
         }
 
         this.picture = newPicture;
+        Double[][] newEnergies = new Double[width()][height()];
+
+        if (!(energies == null)) {
+            for (int y = 0; y < picture.height(); y++) {
+                for (int x = 0; x < picture.width(); x++) {
+
+                    if (x < seam[y] - 1)
+                        newEnergies[x][y] = energies[x][y];
+                    else if (x == seam[y] - 1 || x == seam[y])
+                        newEnergies[x][y] = energy(x, y);
+                    else
+                        newEnergies[x][y] = energies[x - 1][y];
+                }
+            }
+        }
+
+        this.energies = newEnergies;
 
     }
 
