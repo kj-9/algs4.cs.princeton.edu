@@ -20,6 +20,14 @@
         },
         {
             "type": "java",
+            "name": "Launch BaseballElimination teams4b.txt",
+            "request": "launch",
+            "mainClass": "BaseballElimination",
+            "projectName": "baseball_95e82687",
+            "args": "teams4b.txt"
+        },
+        {
+            "type": "java",
             "name": "Launch BaseballElimination teams5.txt",
             "request": "launch",
             "mainClass": "BaseballElimination",
