@@ -51,9 +51,7 @@ public class BaseballElimination {
             for (int j = 0; j < n; j++) {
                 g[i][j] = in.readInt();
             }
-
         }
-
     }
 
     // number of teams
@@ -98,7 +96,6 @@ public class BaseballElimination {
         int j = cache.get(team2).id;
 
         return g[i][j];
-
     }
 
     private void setCache(String team) {
@@ -141,14 +138,10 @@ public class BaseballElimination {
 
             }
         }
-
         assert counter == Vgame;
-
-        // StdOut.println(G.toString());
 
         cache.get(team).ff = new FordFulkerson(G, source, target);
         cache.get(team).cap = cap;
-
     }
 
     // is given team eliminated?
@@ -181,23 +174,19 @@ public class BaseballElimination {
 
         if (!isEliminated(team))
             return null;
-        else {
 
-            Cache thisCache = cache.get(team);
+        Cache thisCache = cache.get(team);
 
-            if (thisCache.ff == null)
-                setCache(team);
+        if (thisCache.ff == null)
+            setCache(team);
 
-            Stack<String> out = new Stack<String>();
+        Stack<String> out = new Stack<String>();
 
-            for (int i = 0; i < numberOfTeams(); i++) {
-                if (i != thisCache.id && thisCache.ff.inCut(i))
-                    out.push(t[i]);
-            }
-
-            return out;
+        for (int i = 0; i < numberOfTeams(); i++) {
+            if (i != thisCache.id && thisCache.ff.inCut(i))
+                out.push(t[i]);
         }
-
+        return out;
     }
 
     public static void main(String[] args) {
