@@ -1,3 +1,4 @@
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.FlowEdge;
 import edu.princeton.cs.algs4.FlowNetwork;
 import edu.princeton.cs.algs4.FordFulkerson;
@@ -5,13 +6,26 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.LinearProbingHashST;
 
-class BaseballElimination {
+public class BaseballElimination {
 
-    private LinearProbingHashST<String, Integer> t = new LinearProbingHashST<String, Integer>();
-    int[] w;
-    int[] l;
-    int[] r;
-    int[][] g;
+    private class Cache {
+        private final Integer id;
+        private FordFulkerson ff;
+        private int cap;
+
+        private Cache(Integer id, FordFulkerson ff, Integer cap) {
+            this.id = id;
+            this.ff = ff;
+            this.cap = cap;
+        }
+    }
+
+    private final LinearProbingHashST<String, Cache> cache = new LinearProbingHashST<String, Cache>();
+    private final String[] t;
+    private final int[] w;
+    private final int[] l;
+    private final int[] r;
+    private final int[][] g;
 
     // create a baseball division from given filename in format specified below
     public BaseballElimination(String filename) {
@@ -19,6 +33,7 @@ class BaseballElimination {
 
         int n = in.readInt();
 
+        t = new String[n];
         w = new int[n];
         l = new int[n];
         r = new int[n];
@@ -26,7 +41,9 @@ class BaseballElimination {
 
         for (int i = 0; i < n; i++) {
 
-            t.put(in.readString(), i);
+            String team = in.readString();
+            cache.put(team, new Cache(i, null, 0));
+            t[i] = team;
             w[i] = in.readInt();
             l[i] = in.readInt();
             r[i] = in.readInt();
@@ -41,17 +58,17 @@ class BaseballElimination {
 
     // number of teams
     public int numberOfTeams() {
-        return t.size();
+        return cache.size();
     }
 
     // all teams
     public Iterable<String> teams() {
-        return t.keys();
+        return cache.keys();
     }
 
     private void validateTeam(String team) {
 
-        if (!t.contains(team))
+        if (!cache.contains(team))
             throw new IllegalArgumentException("team does not exist.");
     }
 
@@ -59,17 +76,17 @@ class BaseballElimination {
     public int wins(String team) {
         validateTeam(team);
 
-        return w[t.get(team)];
+        return w[cache.get(team).id];
     }
 
     public int losses(String team) {
         validateTeam(team);
-        return l[t.get(team)];
+        return l[cache.get(team).id];
     }
 
     public int remaining(String team) {
         validateTeam(team);
-        return r[t.get(team)];
+        return r[cache.get(team).id];
     }
 
     // number of remaining games between team1 and team2
@@ -77,24 +94,16 @@ class BaseballElimination {
         validateTeam(team1);
         validateTeam(team2);
 
-        int i = t.get(team1);
-        int j = t.get(team2);
+        int i = cache.get(team1).id;
+        int j = cache.get(team2).id;
 
         return g[i][j];
 
     }
 
-    // is given team eliminated?
-    public boolean isEliminated(String team) {
-        validateTeam(team);
+    private void setCache(String team) {
 
-        int x = t.get(team);
-
-        for (int i = 0; i < g.length; i++) {
-
-            if (w[x] + r[x] < w[i])
-                return true;
-        }
+        int x = cache.get(team).id;
 
         // for simplicity, create team/game vertices include x but no FlowEdge to/from
         // x.
@@ -108,21 +117,21 @@ class BaseballElimination {
         FlowNetwork G = new FlowNetwork(Vgame + Vteam + 2);
 
         // add game verties
-        int count = 0;
-        int capSource = 0;
+        int counter = 0;
+        int cap = 0;
 
         for (int i = 0; i < numberOfTeams(); i++) {
 
             if (i != x)
-                G.addEdge(new FlowEdge(i, target, w[x] + r[x] - w[i]));
+                G.addEdge(new FlowEdge(i, target, Math.max(0, w[x] + r[x] - w[i])));
 
             for (int j = 0; j < numberOfTeams(); j++) {
 
-                if (i >= j | i == x | j == x)
+                if (i >= j || i == x || j == x)
                     continue;
 
-                count++;
-                capSource += g[i][j];
+                counter++;
+                cap += g[i][j];
 
                 int game = Vteam + (i + j * numberOfTeams());
 
@@ -133,13 +142,34 @@ class BaseballElimination {
             }
         }
 
-        assert count == Vgame;
+        assert counter == Vgame;
 
         // StdOut.println(G.toString());
 
-        Double maxflow = new FordFulkerson(G, source, target).value();
+        cache.get(team).ff = new FordFulkerson(G, source, target);
+        cache.get(team).cap = cap;
 
-        if (maxflow == capSource)
+    }
+
+    // is given team eliminated?
+    public boolean isEliminated(String team) {
+        validateTeam(team);
+
+        int x = cache.get(team).id;
+        Cache thisCache = cache.get(team);
+
+        for (int i = 0; i < g.length; i++) {
+
+            if (w[x] + r[x] < w[i])
+                return true;
+        }
+
+        if (thisCache.ff == null)
+            setCache(team);
+
+        double maxflow = thisCache.ff.value();
+
+        if (maxflow == thisCache.cap)
             return false;
         else
             return true;
@@ -149,8 +179,24 @@ class BaseballElimination {
     public Iterable<String> certificateOfElimination(String team) {
         validateTeam(team);
 
-        if (isEliminated(team))
+        if (!isEliminated(team))
             return null;
+        else {
+
+            Cache thisCache = cache.get(team);
+
+            if (thisCache.ff == null)
+                setCache(team);
+
+            Stack<String> out = new Stack<String>();
+
+            for (int i = 0; i < numberOfTeams(); i++) {
+                if (i != thisCache.id && thisCache.ff.inCut(i))
+                    out.push(t[i]);
+            }
+
+            return out;
+        }
 
     }
 
