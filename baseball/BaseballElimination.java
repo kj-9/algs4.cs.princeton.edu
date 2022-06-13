@@ -176,11 +176,16 @@ public class BaseballElimination {
             return null;
 
         Cache thisCache = cache.get(team);
-
-        if (thisCache.ff == null)
-            setCache(team);
-
+        int x = thisCache.id;
         Stack<String> out = new Stack<String>();
+
+        if (thisCache.ff == null) {
+            for (int i = 0; i < numberOfTeams(); i++) {
+                if (i != x && w[x] + r[x] < w[i])
+                    out.push(t[i]);
+            }
+            return out;
+        }
 
         for (int i = 0; i < numberOfTeams(); i++) {
             if (i != thisCache.id && thisCache.ff.inCut(i))
