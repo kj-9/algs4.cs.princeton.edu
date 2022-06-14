@@ -123,7 +123,12 @@ public class BoggleSolver {
     // otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
-        return dictionary.get(word);
+        Integer point = dictionary.get(word);
+
+        if (point == null)
+            return 0;
+        else
+            return point;
     }
 
     public static void main(String[] args) {
