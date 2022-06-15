@@ -49,9 +49,11 @@ public class BoggleSolver {
         return out;
     }
 
-    private void dfs(int i, int j, StringBuilder strb, boolean marked[][], TrieSET out, BoggleBoard board) {
+    private void dfs(int i, int j, StringBuilder strb, boolean marked[][], TrieSET.Node node, TrieSET out,
+            BoggleBoard board) {
 
         marked[i][j] = true;
+        int lenBefore = strb.length();
 
         char letter = board.getLetter(i, j);
         if (letter == 'Q') {
@@ -62,8 +64,9 @@ public class BoggleSolver {
         }
 
         String str = strb.toString();
+        TrieSET.Node nextNode = dictionary.get(node, str, lenBefore);
 
-        if (dictionary.hasKeysWithPrefix(str)) {
+        if (nextNode != null) {
 
             if (str.length() > 2 && dictionary.contains(str)) {
                 out.add(str);
@@ -71,7 +74,7 @@ public class BoggleSolver {
 
             for (int[] n : neighbors(i, j, board)) {
                 if (!marked[n[0]][n[1]])
-                    dfs(n[0], n[1], strb, marked, out, board);
+                    dfs(n[0], n[1], strb, marked, nextNode, out, board);
             }
 
         }
@@ -94,7 +97,7 @@ public class BoggleSolver {
 
         for (int i = 0; i < board.rows(); i++) {
             for (int j = 0; j < board.cols(); j++) {
-                dfs(i, j, strb, marked, out, board);
+                dfs(i, j, strb, marked, dictionary.root, out, board);
             }
         }
         return out.keysWithPrefix("");
@@ -127,11 +130,11 @@ public class BoggleSolver {
     private class TrieSET implements Iterable<String> {
         private static final int R = 26; // alphabet
 
-        private Node root; // root of trie
+        public Node root; // root of trie
         private int n; // number of keys in trie
         // R-way trie node
 
-        private class Node {
+        public class Node {
             private Node[] next = new Node[R];
             private boolean isString;
         }
@@ -193,16 +196,6 @@ public class BoggleSolver {
             Node x = get(root, prefix, 0);
             collect(x, new StringBuilder(prefix), results);
             return results;
-        }
-
-        public boolean hasKeysWithPrefix(String prefix) {
-            Node x = get(root, prefix, 0);
-
-            if (x == null)
-                return false;
-            else
-                return true;
-
         }
 
         private void collect(Node x, StringBuilder prefix, Queue<String> results) {
