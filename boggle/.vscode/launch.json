@@ -26,7 +26,7 @@
         },
         {
             "type": "java",
-            "name": "Launch BoggleSolver",
+            "name": "Launch BoggleSolver dictionary-algs4.txt board4x4.txt",
             "request": "launch",
             "mainClass": "BoggleSolver",
             "projectName": "boggle_8a188c1d",
@@ -34,7 +34,7 @@
         },
         {
             "type": "java",
-            "name": "Launch BoggleSolver board-q",
+            "name": "Launch BoggleSolver dictionary-algs4.txt board-q.txt",
             "request": "launch",
             "mainClass": "BoggleSolver",
             "projectName": "boggle_8a188c1d",
@@ -42,11 +42,19 @@
         },
         {
             "type": "java",
-            "name": "Launch BoggleSolver board-dichlorodiphenyltrichloroethanes",
+            "name": "Launch BoggleSolver dictionary-yawl.txt board-dichlorodiphenyltrichloroethanes.txt",
             "request": "launch",
             "mainClass": "BoggleSolver",
             "projectName": "boggle_8a188c1d",
             "args": "dictionary-yawl.txt board-dichlorodiphenyltrichloroethanes.txt"
+        },
+        {
+            "type": "java",
+            "name": "Launch BoggleSolver dictionary-yawl.txt board-qwerty.txt",
+            "request": "launch",
+            "mainClass": "BoggleSolver",
+            "projectName": "boggle_8a188c1d",
+            "args": "dictionary-yawl.txt board-qwerty.txt"
         }
     ]
 }
