@@ -68,7 +68,7 @@ public class BoggleSolver {
 
         if (nextNode != null) {
 
-            if (str.length() > 2 && dictionary.contains(str)) {
+            if (str.length() > 2 && nextNode.isString) {
                 out.add(str);
             }
 
@@ -100,7 +100,7 @@ public class BoggleSolver {
                 dfs(i, j, strb, marked, dictionary.root, out, board);
             }
         }
-        return out.keysWithPrefix("");
+        return out;
     }
 
     // Returns the score of the given word if it is in the dictionary, zero
