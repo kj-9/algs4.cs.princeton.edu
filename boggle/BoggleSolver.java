@@ -70,26 +70,17 @@ public class BoggleSolver {
 
     private void dfs(int i, int j, StringBuilder strb, boolean marked[][], SET<String> out, BoggleBoard board) {
 
-        boolean[][] _marked = new boolean[board.rows()][board.cols()];
-
-        for (int row = 0; row < board.rows(); row++) {
-            for (int col = 0; col < board.cols(); col++) {
-                _marked[row][col] = marked[row][col];
-            }
-        }
-        _marked[i][j] = true;
-
-        StringBuilder _strb = new StringBuilder(strb);
+        marked[i][j] = true;
 
         char letter = board.getLetter(i, j);
         if (letter == 'Q') {
-            _strb.append(letter);
-            _strb.append('U');
+            strb.append(letter);
+            strb.append('U');
         } else {
-            _strb.append(letter);
+            strb.append(letter);
         }
 
-        String str = _strb.toString();
+        String str = strb.toString();
 
         if (dictionary.keysWithPrefix(str).iterator().hasNext()) {
 
@@ -98,9 +89,18 @@ public class BoggleSolver {
             }
 
             for (int[] n : neighbors(i, j, board)) {
-                if (!_marked[n[0]][n[1]])
-                    dfs(n[0], n[1], _strb, _marked, out, board);
+                if (!marked[n[0]][n[1]])
+                    dfs(n[0], n[1], strb, marked, out, board);
             }
+
+        }
+        marked[i][j] = false;
+
+        if (letter == 'Q') {
+            strb.deleteCharAt(strb.length() - 1);
+            strb.deleteCharAt(strb.length() - 1);
+        } else {
+            strb.deleteCharAt(strb.length() - 1);
         }
     }
 
