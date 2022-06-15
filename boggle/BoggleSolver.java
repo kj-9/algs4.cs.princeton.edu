@@ -1,12 +1,13 @@
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TST;
+
+import java.util.Iterator;
 
 public class BoggleSolver {
 
-    private final TST<Integer> dictionary;
+    private final TrieSET dictionary;
 
     // Initializes the data structure using the given array of strings as the
     // dictionary.
@@ -14,29 +15,10 @@ public class BoggleSolver {
     // letters A through Z.)
     public BoggleSolver(String[] dictionary) {
 
-        this.dictionary = new TST<Integer>();
-
-        int point;
+        this.dictionary = new TrieSET();
 
         for (String word : dictionary) {
-
-            int len = word.length();
-
-            if (len == 3 || len == 4)
-                point = 1;
-            else if (len == 5)
-                point = 2;
-            else if (len == 6)
-                point = 3;
-            else if (len == 7)
-                point = 5;
-            else if (len >= 8)
-                point = 11;
-            else
-                point = 0;
-
-            this.dictionary.put(word, point);
-
+            this.dictionary.add(word);
         }
 
     }
@@ -63,12 +45,11 @@ public class BoggleSolver {
                 int[] next = { iNext, jNext };
                 out.push(next);
             }
-
         }
         return out;
     }
 
-    private void dfs(int i, int j, StringBuilder strb, boolean marked[][], SET<String> out, BoggleBoard board) {
+    private void dfs(int i, int j, StringBuilder strb, boolean marked[][], TrieSET out, BoggleBoard board) {
 
         marked[i][j] = true;
 
@@ -82,9 +63,9 @@ public class BoggleSolver {
 
         String str = strb.toString();
 
-        if (dictionary.keysWithPrefix(str).iterator().hasNext()) {
+        if (dictionary.hasKeysWithPrefix(str)) {
 
-            if (str.length() > 2 && dictionary.get(str) != null) {
+            if (str.length() > 2 && dictionary.contains(str)) {
                 out.add(str);
             }
 
@@ -107,7 +88,7 @@ public class BoggleSolver {
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
 
-        SET<String> out = new SET<String>();
+        TrieSET out = new TrieSET();
         StringBuilder strb = new StringBuilder();
         boolean marked[][] = new boolean[board.rows()][board.cols()];
 
@@ -116,19 +97,125 @@ public class BoggleSolver {
                 dfs(i, j, strb, marked, out, board);
             }
         }
-        return out;
+        return out.keysWithPrefix("");
     }
 
     // Returns the score of the given word if it is in the dictionary, zero
     // otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
-        Integer point = dictionary.get(word);
+        if (dictionary.contains(word)) {
+            int len = word.length();
 
-        if (point == null)
+            if (len == 3 || len == 4)
+                return 1;
+            else if (len == 5)
+                return 2;
+            else if (len == 6)
+                return 3;
+            else if (len == 7)
+                return 5;
+            else if (len >= 8)
+                return 11;
+            else
+                return 0;
+        } else {
             return 0;
-        else
-            return point;
+        }
+    }
+
+    private class TrieSET implements Iterable<String> {
+        private static final int R = 26; // alphabet
+
+        private Node root; // root of trie
+        private int n; // number of keys in trie
+        // R-way trie node
+
+        private class Node {
+            private Node[] next = new Node[R];
+            private boolean isString;
+        }
+
+        /**
+         * Initializes an empty set of strings.
+         */
+        public TrieSET() {
+        }
+
+        private int posAlphabet(char c) {
+            return c - 65;
+        }
+
+        public boolean contains(String key) {
+            if (key == null)
+                throw new IllegalArgumentException("argument to contains() is null");
+            Node x = get(root, key, 0);
+            if (x == null)
+                return false;
+            return x.isString;
+        }
+
+        private Node get(Node x, String key, int d) {
+            if (x == null)
+                return null;
+            if (d == key.length())
+                return x;
+            int c = posAlphabet(key.charAt(d));
+            return get(x.next[c], key, d + 1);
+        }
+
+        public void add(String key) {
+            if (key == null)
+                throw new IllegalArgumentException("argument to add() is null");
+            root = add(root, key, 0);
+        }
+
+        private Node add(Node x, String key, int d) {
+            if (x == null)
+                x = new Node();
+            if (d == key.length()) {
+                if (!x.isString)
+                    n++;
+                x.isString = true;
+            } else {
+                int c = posAlphabet(key.charAt(d));
+                x.next[c] = add(x.next[c], key, d + 1);
+            }
+            return x;
+        }
+
+        public Iterator<String> iterator() {
+            return keysWithPrefix("").iterator();
+        }
+
+        public Iterable<String> keysWithPrefix(String prefix) {
+            Queue<String> results = new Queue<String>();
+            Node x = get(root, prefix, 0);
+            collect(x, new StringBuilder(prefix), results);
+            return results;
+        }
+
+        public boolean hasKeysWithPrefix(String prefix) {
+            Node x = get(root, prefix, 0);
+
+            if (x == null)
+                return false;
+            else
+                return true;
+
+        }
+
+        private void collect(Node x, StringBuilder prefix, Queue<String> results) {
+            if (x == null)
+                return;
+            if (x.isString)
+                results.enqueue(prefix.toString());
+            for (char c = 0; c < R; c++) {
+                prefix.append((char) (c + 65));
+                collect(x.next[c], prefix, results);
+                prefix.deleteCharAt(prefix.length() - 1);
+            }
+        }
     }
 
     public static void main(String[] args) {
