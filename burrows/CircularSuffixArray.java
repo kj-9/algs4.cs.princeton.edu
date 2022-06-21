@@ -17,7 +17,6 @@ public class CircularSuffixArray {
             throw new IllegalArgumentException("argument is null.");
 
         this.str = s;
-
         n = s.length();
         suffixes = new CircularSuffix[n];
 
@@ -35,11 +34,11 @@ public class CircularSuffixArray {
         }
 
         private char charAt(int i) {
-            return str.charAt((i + this.index) % length());
+            return str.charAt((i + this.index) % n);
         }
 
         public int compareTo(CircularSuffix that) {
-            for (int i = 0; i < length(); i++) {
+            for (int i = 0; i < n; i++) {
                 if (this.charAt(i) < that.charAt(i))
                     return -1;
                 if (this.charAt(i) > that.charAt(i))
