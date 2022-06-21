@@ -48,10 +48,7 @@ public class CircularSuffixArray {
         }
 
         public int compareTo(CircularSuffix that) {
-            if (this == that)
-                return 0; // optimization
-            int n = Math.min(this.length(), that.length());
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < this.length(); i++) {
                 if (this.charAt(i) < that.charAt(i))
                     return -1;
                 if (this.charAt(i) > that.charAt(i))
