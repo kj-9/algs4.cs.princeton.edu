@@ -7,6 +7,7 @@ import edu.princeton.cs.algs4.StdOut;
 public class CircularSuffixArray {
 
     private final int n;
+    private final String str;
     private final CircularSuffix[] suffixes;
 
     // circular suffix array of s
@@ -15,48 +16,37 @@ public class CircularSuffixArray {
         if (s == null)
             throw new IllegalArgumentException("argument is null.");
 
+        this.str = s;
+
         n = s.length();
         suffixes = new CircularSuffix[n];
 
         for (int i = 0; i < suffixes.length; i++)
-            suffixes[i] = new CircularSuffix(s, i);
+            suffixes[i] = new CircularSuffix(i);
 
         Arrays.sort(suffixes);
     }
 
-    private static class CircularSuffix implements Comparable<CircularSuffix> {
-        private final String text;
+    private class CircularSuffix implements Comparable<CircularSuffix> {
         private final int index;
 
-        private CircularSuffix(String text, int index) {
-            this.text = text;
+        private CircularSuffix(int index) {
             this.index = index;
         }
 
-        private int index() {
-            return this.index;
-        }
-
-        private int length() {
-            return this.text.length();
-        }
-
         private char charAt(int i) {
-            int seti = (i + this.index) % text.length();
-            return text.charAt(seti);
-
+            return str.charAt((i + this.index) % length());
         }
 
         public int compareTo(CircularSuffix that) {
-            for (int i = 0; i < this.length(); i++) {
+            for (int i = 0; i < length(); i++) {
                 if (this.charAt(i) < that.charAt(i))
                     return -1;
                 if (this.charAt(i) > that.charAt(i))
                     return +1;
             }
-            return this.length() - that.length();
+            return 0;
         }
-
     }
 
     // length of s
@@ -66,11 +56,10 @@ public class CircularSuffixArray {
 
     // returns index of ith sorted suffix
     public int index(int i) {
-
         if (i < 0 || i >= length())
             throw new IllegalArgumentException("argument is out of range.");
 
-        return suffixes[i].index();
+        return suffixes[i].index;
     }
 
     // unit testing (required)
@@ -83,6 +72,5 @@ public class CircularSuffixArray {
         for (int i = 0; i < csa.length(); i++) {
             StdOut.println(csa.index(i));
         }
-
     }
 }
