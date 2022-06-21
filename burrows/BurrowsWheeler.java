@@ -4,7 +4,7 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class BurrowsWheeler {
 
-    private final static int R = 256; // extended ASCII characters
+    private static final int R = 256; // extended ASCII characters
 
     // apply Burrows-Wheeler transform,
     // reading from standard input and writing to standard output
@@ -80,8 +80,6 @@ public class BurrowsWheeler {
             transform();
         else if (args[0].equals("+"))
             inverseTransform();
-        else
-            StdOut.println("Invalid argument");
     }
 
 }

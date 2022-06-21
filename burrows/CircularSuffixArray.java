@@ -6,8 +6,8 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class CircularSuffixArray {
 
-    private int n;
-    private CircularSuffix[] suffixes;
+    private final int n;
+    private final CircularSuffix[] suffixes;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {

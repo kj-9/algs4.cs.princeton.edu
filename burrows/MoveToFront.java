@@ -4,7 +4,7 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class MoveToFront {
 
-    private final static int R = 256; // extended ASCII characters
+    private static final int R = 256; // extended ASCII characters
 
     // apply move-to-front encoding, reading from standard input and writing to
     // standard output
@@ -59,8 +59,6 @@ public class MoveToFront {
             encode();
         else if (args[0].equals("+"))
             decode();
-        else
-            StdOut.println("Invalid argument");
     }
 
 }
